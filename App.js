@@ -1,6 +1,8 @@
 import { Button, StyleSheet, Text, View } from 'react-native';
 import Constants from 'expo-constants';
 import React from 'react';
+import CountDownTimer from './CountDownTimer';
+import { Vibration } from 'react-native';
 
 
 class Count extends React.Component {
@@ -14,16 +16,21 @@ class Count extends React.Component {
   }
 
   componentDidMount() {
-    this.interval = setInterval(this.inc, 100)
+    this.interval = setInterval(this.inc, 1000)
+  }
+  inc = () => {
+    this.setState(prevState => ({
+      count: prevState.count + 1
+    }))
   }
 
   componentWillUnmount() {
-    console.log('pong')
     clearInterval(this.interval)
   }
 
   shouldComponentUpdate(nextProps) {
-    return !(nextProps.count % 2)
+
+    return true
   }
 
   componentDidUpdate(prevProps) {
@@ -32,16 +39,20 @@ class Count extends React.Component {
     }
   }
 
-  inc = () => {
-    this.setState(prevState => ({
-      count: prevState.count + 1
-    }))
+  pomodoroEnd() {
+    console.log("ended")
+    Vibration.vibrate([1000, 1000])
+
   }
 
   render() {
     return (
       <View>
-        <Text style={styles.count}>{this.state.count}!</Text>
+        <Text style={styles.count}>🍅</Text>
+        <CountDownTimer
+          minutes={25}
+          onFinish={this.pomodoroEnd}
+        />
       </View>
     )
   }
