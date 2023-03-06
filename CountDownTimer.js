@@ -1,48 +1,150 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Touchable, TouchableNativeFeedback, TouchableWithoutFeedback } from 'react-native';
+import { Text, View, StyleSheet, Button } from 'react-native';
 
-class CountDownTimer extends Component {
+class CountdownTimer extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             time: this.props.minutes * 60,
+            isRunning: false,
         };
     }
 
-    tick = () => {
-        this.setState(prevState => {
-            const time = prevState.time - 1;
-            if (time === 0) {
-                clearInterval(this.timer);
-                this.props.onFinish();
-            }
-            return { time };
-        });
-    }
-
     componentDidMount() {
-        this.timer = setInterval(this.tick, 1000)
+        if (this.state.isRunning) {
+            this.startTimer()
+        }
+
     }
 
     componentWillUnmount() {
-        clearInterval(this.timer);
+        this.stopTimer()
+    }
+
+    startTimer = () => {
+        this.setState({ isRunning: true }, () => {
+            this.timer = setInterval(() => {
+                this.setState(prevState => ({
+                    time: prevState.time - 1,
+                }), () => {
+                    if (this.state.time === 0) {
+                        this.stopTimer();
+                        this.props.onFinish();
+                    }
+                });
+            }, 1000);
+        });
+    };
+
+    stopTimer = () => {
+        clearInterval(this.timer)
+        this.setState({ isRunning: false })
+    }
+
+    resetTimer = (minutes) => {
+        this.stopTimer()
+        this.setState({
+            time: minutes * 60,
+            isRunning: false,
+        })
+    }
+
+    incrementMinutes = () => {
+        this.setState(prevState => ({
+            time: prevState.time + 60,
+        }))
+    }
+
+    decrementMinutes = () => {
+        this.setState(prevState => ({
+            time: Math.max(0, prevState.time - 60),
+        }))
     }
 
     render() {
-        const { time } = this.state;
+        const { time, isRunning } = this.state;
         const minutes = Math.floor(time / 60);
         const seconds = time % 60;
 
         return (
-            <View>
-                <Text style={styles.bigGray}>{`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`}</Text>
+            <View >
+                <View
+                    style={{ flexDirection: 'row', alignItems: 'center' }}
+                >
+                    <TouchableNativeFeedback
+                        onPress={this.decrementMinutes}
+                        disabled={isRunning}
+                        accessibilityLabel="Decrease minutes"
+                        accessibilityState={{ disabled: isRunning }}
+                    >
+                        <Text
+                            style={styles.bigGray}
+
+                        >
+                            -
+                        </Text>
+                    </TouchableNativeFeedback>
+                    <Text
+                        style={styles.bigGray}
+                    >
+                        {`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`}
+                    </Text>
+                    <TouchableNativeFeedback
+                        onPress={this.incrementMinutes}
+                        disabled={isRunning}
+                        accessibilityLabel="Increase minutes"
+                        accessibilityState={{ disabled: isRunning }}
+                    >
+                        <Text
+                            style={styles.bigGray}
+
+                        >
+                            +
+                        </Text>
+                    </TouchableNativeFeedback>
+                </View>
+                <View
+                    style={{ alignItems: 'center' }}
+                >
+                    <TouchableNativeFeedback
+
+                        onPress={isRunning ? this.stopTimer : this.startTimer}
+                        disabled={isRunning ? this.stopTimer : this.startTimer}
+                        accessibilityLabel={isRunning ? 'Stop timer' : 'Start timer'}
+                        accessibilityState={{ disabled: isRunning }}
+                    >
+                        <Text
+                            style={styles.bigGray}
+                        >
+                            {isRunning ? 'Stop' : 'Start'}
+                        </Text>
+                    </TouchableNativeFeedback>
+                    <TouchableNativeFeedback
+                        onPress={() => this.resetTimer(this.props.minutes)}
+                        disabled={isRunning}
+                        accessibilityLabel="Reset timer"
+                        accessibilityState={{ disabled: isRunning }}
+                    >
+                        <Text
+                            style={styles.bigGray}
+
+                        >
+                            Reset
+                        </Text>
+                    </TouchableNativeFeedback>
+
+                </View>
+
+
             </View>
+
         );
     }
 }
 
-export default CountDownTimer;
+export default CountdownTimer;
 
 
 const styles = StyleSheet.create({
@@ -55,6 +157,9 @@ const styles = StyleSheet.create({
     bigGray: {
         fontSize: 100,
         color: '#6c6c6c',
-
+        padding: 10,
+    },
+    button: {
+        titleStyle: '100'
     }
 });
