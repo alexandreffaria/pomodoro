@@ -31,19 +31,20 @@ class CountDownTimer extends Component {
 
     render() {
         const { time } = this.state;
-
         const minutes = Math.floor(time / 60);
         const seconds = time % 60;
 
         return (
             <View>
-                <Text style={styles.count}>{`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`}</Text>
+                <Text style={styles.bigGray}>{`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`}</Text>
             </View>
         );
     }
 }
 
 export default CountDownTimer;
+
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    count: {
+    bigGray: {
         fontSize: 100,
         color: '#6c6c6c',
 
