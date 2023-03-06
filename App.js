@@ -1,22 +1,47 @@
 import { Button, StyleSheet, Text, View } from 'react-native';
-import Constants from 'expo-constants';
 import React from 'react';
-import CountDownTimer from './CountDownTimer';
+import CountdownTimer from './CountDownTimer';
 import { Vibration } from 'react-native';
 
 export default class App extends React.Component {
 
-  pomodoroEnd() {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      isPomodoro: false
+    }
+  }
+
+
+  pomodoroEnd = () => {
     console.log("ended")
     Vibration.vibrate([1000, 1000])
+    this.setState(prevState => ({
+      isPomodoro: !prevState.isPomodoro
+    }))
+
+    this.countdownTimer.resetTimer(5);
+    this.countdownTimer.startTimer();
   }
 
   render() {
+
+    const { isPomodoro } = this.state
+    const minutes = isPomodoro ? 25 : 5
+
     return (
-      <View style={styles.container}>
-        <Text style={styles.bigGray}>🍅</Text>
-        <CountDownTimer
-          minutes={.05}
+      <View
+        style={styles.container}
+      >
+        <Text
+          style={styles.bigGray}
+        >
+          🍅
+        </Text>
+        <CountdownTimer
+          ref={component => this.countdownTimer = component}
+          minutes={25}
           onFinish={this.pomodoroEnd}
         />
       </View>
